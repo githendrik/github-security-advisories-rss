@@ -2,27 +2,17 @@ import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import { Feed } from 'feed'
 
-const createFeed = async () => {
+const createFeed = async (slug) => {
 
     const feed = new Feed({
-        title: 'Feed Title',
-        description: 'This is my personal feed!',
+        title: `Security Advisories for ${slug}`,
+        description: `Security Advisories for ${slug}`,
         id: 'https://example.com/',
         link: 'https://example.com/',
         language: 'en',
-        feedLinks: {
-            json: 'https://example.com/json',
-            atom: 'https://example.com/atom'
-        },
-        author: {
-            name: 'John Doe',
-            email: 'johndoe@example.com',
-            link: 'https://example.com/johndoe'
-        }
     });
 
-
-    const response = await fetch('https://github.com/datahub-project/datahub/security');
+    const response = await fetch(`https://github.com/${slug}/security`);
     // const response = await fetch('https://artifactory.swisscom.com/artifactory/github-generic-remote/datahub-project/datahub/security');
     const body = await response.text();
 
@@ -60,9 +50,11 @@ const createFeed = async () => {
 };
 
 export default async function handler(request, response) {
-    const slug = request.query;
+    const slug = request.query.slug;
 
-    console.log(slug);
+    if (!slug) {
+        return response.send('Please provide your project slug as query param: ?slug=project/repo')
+    }
 
     const f = await createFeed(slug);
     response.setHeader("content-type", "text/xml")
