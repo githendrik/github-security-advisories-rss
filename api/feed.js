@@ -60,7 +60,11 @@ const createFeed = async () => {
 };
 
 export default async function handler(request, response) {
-    const f = await createFeed();
+    const slug = request.query;
+
+    console.log(slug);
+
+    const f = await createFeed(slug);
     response.setHeader("content-type", "text/xml")
     return response.send(f.rss2());
 }
