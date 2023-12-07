@@ -61,5 +61,13 @@ const createFeed = async () => {
 
 export default async function handler(request, response) {
     const f = await createFeed();
-    return response.send(f.rss2());
+
+    const r = new Response(f.rss2(), {
+        status: 200,
+        statusText: "ok",
+    });
+
+    r.headers.append("content-type", "text/xml");
+
+    return r;
 }
